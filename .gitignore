@@ -1,0 +1,29 @@
+# .gitignore padrão para Python
+
+# Compilados e Caches
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribuição e Instalação
+*.egg-info/
+.eggs/
+dist/
+build/
+
+# Ambientes Virtuais
+.venv/
+venv/
+env/
+
+# IDEs
+.vscode/
+.idea/
+
+# Específico do seu projeto (Para o Simulador/GA)
+results/
+logs/
+temp/
+*.log
+*.csv
+!configs/*.csv  # Não ignorar CSVs dentro da pasta configs (se forem entradas pequenas)
