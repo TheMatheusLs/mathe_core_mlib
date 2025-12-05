@@ -3,6 +3,7 @@ import pickle
 import os
 import yaml
 from typing import Any, Dict
+import pandas as pd
 
 
 def load_json(file_path: str) -> Dict[str, Any]:
@@ -60,3 +61,13 @@ def save_pickle(data: Any, file_path: str) -> None:
     
     with open(file_path, 'wb') as f:
         pickle.dump(data, f)
+
+
+def load_csv(file_path: str, **kwargs) -> pd.DataFrame:
+    """
+    Carrega um arquivo CSV em um DataFrame do Pandas.
+    """
+    if not os.path.exists(file_path):
+        raise FileNotFoundError(f"Arquivo CSV não encontrado: {file_path}")
+    
+    return pd.read_csv(file_path, **kwargs)
