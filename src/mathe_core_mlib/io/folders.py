@@ -25,6 +25,7 @@ class ExperimentFolder:
         
         self.folder_name = "_".join(folder_name_parts)
         self.path = os.path.join(base_path, self.folder_name)
+        self.base_path = base_path
         
         # Cria a pasta imediatamente
         os.makedirs(self.path, exist_ok=False)
@@ -91,3 +92,16 @@ class ExperimentFolder:
 
     def __str__(self):
         return f"ExperimentFolder({self.path})"
+    
+
+    def get_logging_path(self, log_name: str = "simulation.log"):
+        """
+        Retorna o caminho para o arquivo de logging
+        
+        Args:
+            log_name: nome do arquivo de log
+
+        Return:
+            Caminho para o arquivo
+        """
+        return os.path.join(self.path, log_name)
