@@ -36,6 +36,10 @@ class ExperimentFolder:
         """Retorna o nome da pasta do experimento."""
         return self.folder_name
 
+    def get_base_path(self) -> str:
+        """Retorna o caminho base da pasta do experimento."""
+        return self.path
+
 
     def get_path(self, filename: str = "") -> str:
         """Retorna o caminho completo para um arquivo dentro desta pasta."""
