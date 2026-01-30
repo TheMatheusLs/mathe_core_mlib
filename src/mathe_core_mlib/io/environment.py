@@ -13,6 +13,61 @@ except ImportError:
     class Fore: RED = YELLOW = GREEN = ""
     class Style: RESET_ALL = BRIGHT = ""
 
+def _get_git_info(path: Path) -> dict:
+    """Extrai informações do git de um diretório."""
+    git_info = {
+        "path": str(path),
+        "git_commit": "Unknown",
+        "git_branch": "Unknown",
+        "git_tag": None,
+        "last_commit_msg": "",
+        "is_dirty": False
+    }
+
+    if (path / ".git").exists():
+        try:
+            # 1. Hash Curto
+            git_info["git_commit"] = subprocess.check_output(
+                ["git", "rev-parse", "--short", "HEAD"], 
+                cwd=path, stderr=subprocess.DEVNULL
+            ).decode().strip()
+
+            # 2. Branch Atual (retorna 'HEAD' se estiver detached)
+            git_info["git_branch"] = subprocess.check_output(
+                ["git", "rev-parse", "--abbrev-ref", "HEAD"], 
+                cwd=path, stderr=subprocess.DEVNULL
+            ).decode().strip()
+
+            # 3. Título do Último Commit
+            git_info["last_commit_msg"] = subprocess.check_output(
+                ["git", "log", "-1", "--format=%s"], 
+                cwd=path, stderr=subprocess.DEVNULL
+            ).decode("utf-8", errors="replace").strip()
+
+            # 4. Tag Exata (se houver)
+            try:
+                git_info["git_tag"] = subprocess.check_output(
+                    ["git", "describe", "--tags", "--exact-match"], 
+                    cwd=path, stderr=subprocess.DEVNULL
+                ).decode().strip()
+            except subprocess.CalledProcessError:
+                git_info["git_tag"] = None
+
+            # 5. Status Dirty
+            status = subprocess.check_output(
+                ["git", "status", "--porcelain"], 
+                cwd=path, stderr=subprocess.DEVNULL
+            ).decode().strip()
+            
+            git_info["is_dirty"] = bool(status)
+            if status:
+                git_info["dirty_files"] = status.split('\n')
+
+        except Exception as e:
+            git_info["git_error"] = str(e)
+            
+    return git_info
+
 def snapshot_environment(save_path: Union[str, Path]) -> Path:
     """
     Gera um snapshot (JSON) do ambiente atual usando 'uv pip list'.
@@ -30,6 +85,7 @@ def snapshot_environment(save_path: Union[str, Path]) -> Path:
         "python_version": platform.python_version(),
         "platform": platform.platform(),
         "executable": sys.executable,
+        "simulator_git": _get_git_info(Path.cwd()), # Assume que o "simulador" é o código que está rodando no CWD
         "local_libraries": {},
         "dependencies": {}
     }
@@ -56,58 +112,8 @@ def snapshot_environment(save_path: Union[str, Path]) -> Path:
         if editable_path:
             local_path = Path(editable_path).resolve()
             
-            git_info = {
-                "version": version,
-                "path": str(local_path),
-                "git_commit": "Unknown",
-                "git_branch": "Unknown",
-                "git_tag": None,
-                "last_commit_msg": "",
-                "is_dirty": False
-            }
-
-            if (local_path / ".git").exists():
-                try:
-                    # 1. Hash Curto
-                    git_info["git_commit"] = subprocess.check_output(
-                        ["git", "rev-parse", "--short", "HEAD"], 
-                        cwd=local_path, stderr=subprocess.DEVNULL
-                    ).decode().strip()
-
-                    # 2. Branch Atual (retorna 'HEAD' se estiver detached)
-                    git_info["git_branch"] = subprocess.check_output(
-                        ["git", "rev-parse", "--abbrev-ref", "HEAD"], 
-                        cwd=local_path, stderr=subprocess.DEVNULL
-                    ).decode().strip()
-
-                    # 3. Título do Último Commit
-                    # errors='replace' evita quebra com emojis ou caracteres estranhos
-                    git_info["last_commit_msg"] = subprocess.check_output(
-                        ["git", "log", "-1", "--format=%s"], 
-                        cwd=local_path, stderr=subprocess.DEVNULL
-                    ).decode("utf-8", errors="replace").strip()
-
-                    # 4. Tag Exata (se houver)
-                    try:
-                        git_info["git_tag"] = subprocess.check_output(
-                            ["git", "describe", "--tags", "--exact-match"], 
-                            cwd=local_path, stderr=subprocess.DEVNULL
-                        ).decode().strip()
-                    except subprocess.CalledProcessError:
-                        git_info["git_tag"] = None # Não é uma tag exata
-                        
-                    # 5. Status Dirty
-                    status = subprocess.check_output(
-                        ["git", "status", "--porcelain"], 
-                        cwd=local_path, stderr=subprocess.DEVNULL
-                    ).decode().strip()
-                    
-                    git_info["is_dirty"] = bool(status)
-                    if status:
-                        git_info["dirty_files"] = status.split('\n')
-
-                except Exception as e:
-                    git_info["git_error"] = str(e)
+            git_info = _get_git_info(local_path)
+            git_info["version"] = version # Adiciona a versão do pacote ao dict
             
             env_data["local_libraries"][name] = git_info
         else:
