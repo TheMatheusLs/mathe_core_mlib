@@ -85,6 +85,7 @@ def snapshot_environment(save_path: Union[str, Path]) -> Path:
         "python_version": platform.python_version(),
         "platform": platform.platform(),
         "executable": sys.executable,
+        "command_line_args": sys.argv, # Argumentos usados para rodar o script
         "simulator_git": _get_git_info(Path.cwd()), # Assume que o "simulador" é o código que está rodando no CWD
         "local_libraries": {},
         "dependencies": {}
