@@ -3,7 +3,10 @@ import pickle
 import os
 import yaml
 from typing import Any, Dict
+import hashlib
 import pandas as pd
+from pathlib import Path
+from typing import Any, Dict, Union
 
 
 def load_json(file_path: str) -> Dict[str, Any]:
@@ -71,3 +74,28 @@ def load_csv(file_path: str, **kwargs) -> pd.DataFrame:
         raise FileNotFoundError(f"Arquivo CSV não encontrado: {file_path}")
     
     return pd.read_csv(file_path, **kwargs)
+
+
+def calculate_file_hash(file_path: Union[str, Path], algorithm: str = "sha256", chunk_size: int = 8192) -> str:
+    """
+    Calcula o hash de um arquivo de forma eficiente (em chunks).
+    
+    Args:
+        file_path: Caminho para o arquivo.
+        algorithm: Algoritmo de hash (padrão: "sha256").
+        chunk_size: Tamanho do chunk em bytes (padrão: 8192).
+        
+    Returns:
+        String hexadecimal do hash.
+    """
+    file_path = str(file_path) # Garante que seja string
+    if not os.path.exists(file_path):
+        raise FileNotFoundError(f"Arquivo não encontrado para hash: {file_path}")
+
+    hash_obj = hashlib.new(algorithm)
+    
+    with open(file_path, "rb") as f:
+        while chunk := f.read(chunk_size):
+            hash_obj.update(chunk)
+            
+    return hash_obj.hexdigest()
