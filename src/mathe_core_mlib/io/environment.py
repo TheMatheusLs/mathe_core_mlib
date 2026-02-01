@@ -153,6 +153,20 @@ def enforce_clean_environment(snapshot_path: Union[str, Path], strict: bool = Tr
         raise e
 
     dirty_libs = []
+    
+    # 1. Verifica o Simulador (Warn Only)
+    sim_git = data.get("simulator_git", {})
+    if sim_git.get("is_dirty", False):
+        print(f"\n{Fore.YELLOW}{'='*60}")
+        print(f"⚠️  WARNING: O código do simulador possui alterações não commitadas.")
+        print(f"{'='*60}{Style.RESET_ALL}")
+        if "dirty_files" in sim_git:
+            for f in sim_git["dirty_files"]:
+                print(f"{Fore.YELLOW}    {f}{Style.RESET_ALL}")
+        print(f"{Fore.YELLOW}>> Isso não impede a execução, mas os resultados podem não ser reprodutíveis.{Style.RESET_ALL}")
+        print(f"{Fore.YELLOW}>> Recomenda-se commitar as mudanças para experimentos finais.\n{Style.RESET_ALL}")
+
+    # 2. Verifica Dependências Locais (Strict)
     for lib_name, lib_info in data.get("local_libraries", {}).items():
         if lib_info.get("is_dirty", False):
             dirty_libs.append((lib_name, lib_info.get("dirty_files", [])))
