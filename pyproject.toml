@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "mathe-core-mlib"  # Nome de instalação (pip install mathe-core-mlib)
-version = "0.2.1"
+version = "0.3.0"
 description = "Biblioteca base de utilitários matemáticos e gráficos."
 authors = [{name = "Matheus Lôbo dos Santos", email = "matheus.lobo@ufpe.br"}]
 dependencies = [

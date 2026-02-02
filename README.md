@@ -14,6 +14,7 @@ A `mathe-core-mlib` foi construída sob o princípio de **Fail-Fast (Falha Rápi
 A biblioteca está organizada em subcomponentes lógicos:
 - `mathe_core_mlib.math`: Conversões físicas e matemáticas (vetorizadas com NumPy).
 - `mathe_core_mlib.io`: Persistência de arquivos e gestão de ciclo de vida de experimentos.
+- `mathe_core_mlib.analysis`: Comparação e validação de resultados de simulações GNPy.
 
 ---
 
@@ -61,7 +62,41 @@ A classe `ExperimentFolder` automatiza a organização de resultados, garantindo
 
 ---
 
-## 3. Persistência de Dados (IO)
+## 4. Análise de Simulações GNPy
+Módulo: `mathe_core_mlib.analysis`
+
+Ferramentas para validação e comparação de resultados entre diferentes execuções de simulações GNPy. Essencial para garantir reprodutibilidade e validar modificações no código.
+
+### Comparação de Configurações
+
+| Função | Descrição | Retorno |
+| :--- | :--- | :--- |
+| `compare_yaml_files` | Verifica identidade de arquivos `sim_config.yaml` | (bool, str, dict) |
+| `compare_env_snapshots` | Compara ambientes de execução Python | (bool, str, DataFrame) |
+
+### Exemplo de Uso
+
+```python
+from mathe_core_mlib.analysis import compare_yaml_files, compare_env_snapshots
+from pathlib import Path
+
+# Comparar configurações de simulação
+folders = [Path("data/sim_v1"), Path("data/sim_v2")]
+match, msg, config = compare_yaml_files(folders)
+if match:
+    print("✅ Configurações idênticas")
+else:
+    print(f"❌ {msg}")
+
+# Comparar ambientes Python
+labels = {"sim_v1": "Original", "sim_v2": "Optimized"}
+env_match, env_msg, df = compare_env_snapshots(folders, labels, ignore_gnpy_commit=True)
+print(df[df['Diferente'] == '⚠️'])  # Mostrar apenas pacotes com diferenças
+```
+
+---
+
+## 5. Persistência de Dados (IO)
 Módulo: `mathe_core_mlib.io.files`
 
 Wrappers robustos para leitura e escrita que garantem codificação `UTF-8` e criação automática de diretórios pais (`parent directories`) para evitar `FileNotFoundError`.
