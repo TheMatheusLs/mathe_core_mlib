@@ -16,10 +16,10 @@ import pandas as pd
 import json
 import yaml
 from pathlib import Path
-from typing import Dict, List, Tuple, Optional
+from typing import Dict, List, Tuple, Optional, Union
 
 
-def compare_yaml_files(folders: List[Path]) -> Tuple[bool, str, Optional[dict]]:
+def compare_yaml_files(folders: List[Union[str, Path]]) -> Tuple[bool, str, Optional[dict]]:
     """
     Compara os arquivos sim_config.yaml entre as pastas.
     
@@ -36,6 +36,9 @@ def compare_yaml_files(folders: List[Path]) -> Tuple[bool, str, Optional[dict]]:
         >>> if match:
         ...     print("✅ Configurações idênticas")
     """
+    # Convert strings to Path objects if necessary
+    folders = [Path(f) if isinstance(f, str) else f for f in folders]
+    
     configs = []
     
     for folder in folders:
@@ -55,7 +58,7 @@ def compare_yaml_files(folders: List[Path]) -> Tuple[bool, str, Optional[dict]]:
     return True, "✅ Todos os arquivos sim_config.yaml são idênticos", reference
 
 
-def compare_env_snapshots(folders: List[Path], folder_labels: Dict[str, str], 
+def compare_env_snapshots(folders: List[Union[str, Path]], folder_labels: Dict[str, str], 
                           ignore_gnpy_commit: bool = True) -> Tuple[bool, str, pd.DataFrame]:
     """
     Compara os arquivos env_snapshot.json entre as pastas.
@@ -75,6 +78,9 @@ def compare_env_snapshots(folders: List[Path], folder_labels: Dict[str, str],
         >>> match, msg, df = compare_env_snapshots(folders, labels)
         >>> print(df[df['Diferente'] == '⚠️'])  # Mostrar apenas diferenças
     """
+    # Convert strings to Path objects if necessary
+    folders = [Path(f) if isinstance(f, str) else f for f in folders]
+    
     envs = []
     
     for folder in folders:
