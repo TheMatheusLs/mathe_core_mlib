@@ -19,16 +19,24 @@ from pathlib import Path
 from typing import Dict, List, Tuple, Optional, Union
 
 
-def compare_yaml_files(folders: List[Union[str, Path]]) -> Tuple[bool, str, Optional[dict]]:
+def compare_yaml_files(
+        folders: List[Union[str, Path]],
+        ignore_path_to_scenarios: bool = False,
+        ignore_is_debug: bool = False,
+        ignore_parameters: bool = False
+    ) -> Tuple[bool, str, Optional[dict]]:
     """
-    Compara os arquivos sim_config.yaml entre as pastas.
+    Compara os arquivos sim_config.yaml entre as pastas, com opções de ignorar campos.
     
     Args:
         folders: Lista de pastas a comparar
+        ignore_path_to_scenarios: Se True, ignora o campo 'path_to_scenarios'
+        ignore_is_debug: Se True, ignora o campo 'is_debug'
+        ignore_parameters: Se True, ignora todo o bloco 'parameters'
     
     Returns:
-        Tuple[bool, str, dict]: (são_iguais, mensagem, config_referência)
-    
+        Tuple[bool, str, dict]: (são_iguais, mensagem, config_referência_filtrada)
+
     Example:
         >>> from pathlib import Path
         >>> folders = [Path("sim_v1"), Path("sim_v2")]
@@ -40,6 +48,9 @@ def compare_yaml_files(folders: List[Union[str, Path]]) -> Tuple[bool, str, Opti
     folders = [Path(f) if isinstance(f, str) else f for f in folders]
     
     configs = []
+
+    # Campos que SEMPRE devem ser ignorados
+    always_ignore = ['path_to_save', 'max_workers']
     
     for folder in folders:
         config_file = folder / 'sim_config.yaml'
@@ -47,15 +58,57 @@ def compare_yaml_files(folders: List[Union[str, Path]]) -> Tuple[bool, str, Opti
             return False, f"❌ Arquivo não encontrado: {config_file}", None
         
         with open(config_file, 'r', encoding='utf-8') as f:
-            configs.append(yaml.safe_load(f))
+            data = yaml.safe_load(f)
+
+            # Remover campos obrigatórios
+            for key in always_ignore:
+                data.pop(key, None)
+
+            # Remover campos opcionais se solicitado
+            if ignore_path_to_scenarios:
+                data.pop('path_to_scenarios', None)
+            
+            if ignore_is_debug:
+                data.pop('is_debug', None)
+                
+            if ignore_parameters:
+                data.pop('parameters', None)
+                
+            configs.append(data)
     
     # Comparar os configs
     reference = configs[0]
     for i, config in enumerate(configs[1:], 1):
         if config != reference:
-            return False, f"❌ Arquivo sim_config.yaml diferente entre pasta 0 e {i}", None
+            # Identificar a diferença específica para melhorar a mensagem
+            ref_keys = set(reference.keys())
+            curr_keys = set(config.keys())
+            diff_msg = ""
+
+            # 1. Verificar chaves diferentes
+            if ref_keys != curr_keys:
+                missing = ref_keys - curr_keys
+                extra = curr_keys - ref_keys
+                parts = []
+                if missing: parts.append(f"faltando {missing}")
+                if extra: parts.append(f"extras {extra}")
+                diff_msg = "Chaves estruturais diferentes: " + ", ".join(parts)
+            
+            # 2. Verificar valores diferentes (para chaves comuns)
+            else:
+                diffs = []
+                for k in reference:
+                    if reference[k] != config[k]:
+                        if isinstance(reference[k], dict) and isinstance(config[k], dict):
+                            diffs.append(f"bloco '{k}' difere")
+                        else:
+                            diffs.append(f"campo '{k}': {reference[k]} != {config[k]}")
+                diff_msg = "Valores diferentes: " + ", ".join(diffs)
+
+
+            return False, f"❌ Diferença na pasta {i} ({folders[i].name}): {diff_msg}", None
     
-    return True, "✅ Todos os arquivos sim_config.yaml são idênticos", reference
+    return True, "✅ Todos os arquivos sim_config.yaml são idênticos (nos campos verificados)", reference
 
 
 def compare_env_snapshots(folders: List[Union[str, Path]], folder_labels: Dict[str, str], 
