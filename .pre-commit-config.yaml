@@ -4,3 +4,4 @@ repos:
     hooks:
     -   id: pydocstyle
         args: ["--convention=numpy", "--add-ignore=D401"]
+        exclude: ^tests/  # <--- Adicione esta linha
