@@ -1,9 +1,11 @@
 # .gitignore padrão para Python
 
-# Compilados e Caches
+# Python: Cache e Artefatos
 __pycache__/
 *.py[cod]
 *$py.class
+*.so
+*.egg
 
 # Distribuição e Instalação
 *.egg-info/
@@ -19,6 +21,9 @@ env/
 # IDEs
 .vscode/
 .idea/
+
+# MkDocs: Documentação Compilada
+site/
 
 # Específico do seu projeto (Para o Simulador/GA)
 results/
