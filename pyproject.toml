@@ -26,9 +26,15 @@ dev = [
     "mkdocs-material (>=9.7.5,<10.0.0)",
     "mkdocstrings[python] (>=1.0.3,<2.0.0)",
     "pydeps (>=3.0.2,<4.0.0)",
-    "pre-commit (>=4.5.1,<5.0.0)"
+    "pre-commit (>=4.5.1,<5.0.0)",
+    "pytest (>=9.0.2,<10.0.0)",
+    "pytest-cov (>=7.0.0,<8.0.0)"
 ]
 
 [[tool.poetry.packages]]
 include = "mathe_core_mlib"
 from = "src"
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]

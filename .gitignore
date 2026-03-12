@@ -32,3 +32,9 @@ temp/
 *.log
 *.csv
 !configs/*.csv  # Não ignorar CSVs dentro da pasta configs (se forem entradas pequenas)
+
+# Arquivos do Pytest
+.coverage
+.coverage.*
+htmlcov/
+.coverage.xml

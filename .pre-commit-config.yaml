@@ -1,0 +1,6 @@
+repos:
+-   repo: https://github.com/PyCQA/pydocstyle
+    rev: 6.3.0
+    hooks:
+    -   id: pydocstyle
+        args: ["--convention=numpy", "--add-ignore=D401"]
