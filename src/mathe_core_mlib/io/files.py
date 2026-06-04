@@ -2,14 +2,13 @@ import json
 import pickle
 import os
 import yaml
-from typing import Any, Dict
 import hashlib
 import pandas as pd
 from pathlib import Path
-from typing import Any, Dict, Union
+from typing import Any
 
 
-def load_json(file_path: str) -> Dict[str, Any]:
+def load_json(file_path: str | Path) -> dict[str, Any]:
     """
     Carrega um arquivo JSON e retorna um dicionário.
     """
@@ -20,7 +19,7 @@ def load_json(file_path: str) -> Dict[str, Any]:
         return json.load(f)
 
 
-def save_json(data: Dict[str, Any], file_path: str, indent: int = 4) -> None:
+def save_json(data: dict[str, Any], file_path: str, indent: int = 4) -> None:
     """
     Salva um dicionário em um arquivo JSON.
     """
@@ -31,7 +30,7 @@ def save_json(data: Dict[str, Any], file_path: str, indent: int = 4) -> None:
         json.dump(data, f, indent=indent, ensure_ascii=False)
 
 
-def load_yaml(file_path: str) -> Dict[str, Any]:
+def load_yaml(file_path: str | Path) -> dict[str, Any]:
     """
     Carrega um arquivo YAML e retorna um dicionário.
     """
@@ -39,7 +38,7 @@ def load_yaml(file_path: str) -> Dict[str, Any]:
         return yaml.safe_load(file)
 
 
-def save_yaml(data: Dict[str, Any], file_path: str) -> None:
+def save_yaml(data: dict[str, Any], file_path: str) -> None:
     """
     Salva um dicionário em arquivo YAML.
     """
@@ -76,7 +75,7 @@ def load_csv(file_path: str, **kwargs) -> pd.DataFrame:
     return pd.read_csv(file_path, **kwargs)
 
 
-def calculate_file_hash(file_path: Union[str, Path], algorithm: str = "sha256", chunk_size: int = 8192) -> str:
+def calculate_file_hash(file_path: str | Path, algorithm: str = "sha256", chunk_size: int = 8192) -> str:
     """
     Calcula o hash de um arquivo de forma eficiente (em chunks).
     
