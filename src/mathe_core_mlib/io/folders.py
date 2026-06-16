@@ -1,13 +1,15 @@
-from pathlib import Path
 import shutil
 from datetime import datetime
+from pathlib import Path
 from typing import Optional
+
 
 class ExperimentFolder:
     """
     Gerencia a criação e ciclo de vida de uma pasta de resultados de experimento.
     Gera nomes baseados em Timestamp e Tag.
     """
+
     def __init__(self, base_path: Path, tag: str = "sim", version: str = ""):
         """
         Args:
@@ -15,22 +17,21 @@ class ExperimentFolder:
             tag: Identificador curto do experimento (ex: 'GA_Optimization').
             version: Versão opcional para compor o nome (ex: 'v1.0').
         """
-        self.timestamp = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
-        
+        self.timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+
         # Constrói o nome: "2023-10-27_14-30-00_v1.0_GA_Optimization"
         folder_name_parts = [self.timestamp]
         if version:
-            folder_name_parts.append("version_" + version.replace(".","-"))
+            folder_name_parts.append("version_" + version.replace(".", "-"))
         folder_name_parts.append(tag)
-        
+
         self.folder_name = "_".join(folder_name_parts)
         self.path = base_path / Path(self.folder_name)
         self.base_path = base_path
-        
+
         # Cria a pasta imediatamente
         self.path.mkdir(parents=True, exist_ok=False)
         self._finalized = False
-
 
     def get_folder_name(self) -> str:
         """Retorna o nome da pasta do experimento."""
@@ -40,37 +41,33 @@ class ExperimentFolder:
         """Retorna o caminho base da pasta do experimento."""
         return self.path
 
-
     def get_path(self, filename: str = "") -> Path:
         """Retorna o caminho completo para um arquivo dentro desta pasta."""
         return self.path / filename
 
-
     def copy_file(self, src_path: Path, new_name: Optional[str] = None) -> None:
         """
         Copia um arquivo externo para dentro da pasta do experimento.
-        
+
         Args:
             src_path: Caminho do arquivo original.
             new_name: (Opcional) Novo nome do arquivo no destino.
         """
         if not src_path.exists():
             raise FileNotFoundError(f"Arquivo fonte não encontrado: {src_path}")
-            
+
         filename = new_name if new_name else src_path.name
         dst_path = self.get_path(filename)
         shutil.copyfile(src_path, dst_path)
 
-
     def save_text(self, filename: str, content: str) -> None:
         """Salva uma string em um arquivo de texto simples."""
-        (self.path / filename).write_text(content, encoding='utf-8')
-
+        (self.path / filename).write_text(content, encoding="utf-8")
 
     def finish(self, status: str = "success", info_msg: str = "") -> None:
         """
         Finaliza o experimento renomeando a pasta com um sufixo (_Success, _Fail).
-        
+
         Args:
             status: 'success' ou 'fail' (ou qualquer string).
             info_msg: Mensagem opcional para salvar em um txt de status.
@@ -78,9 +75,9 @@ class ExperimentFolder:
         if self._finalized:
             return
 
-        suffix = f"_{status.upper()}" # _SUCESSED / _FAILED
+        suffix = f"_{status.upper()}"  # _SUCESSED / _FAILED
         new_path = self.path.with_name(self.path.name + suffix)
-        
+
         # Salva log final se houver mensagem
         if info_msg:
             log_name = "Success.txt" if status.lower() == "success" else "Error.txt"
@@ -95,12 +92,11 @@ class ExperimentFolder:
 
     def __str__(self) -> str:
         return f"ExperimentFolder({self.path})"
-    
 
     def get_logging_path(self, log_name: str = "simulation.log") -> Path:
         """
         Retorna o caminho para o arquivo de logging
-        
+
         Args:
             log_name: nome do arquivo de log
 

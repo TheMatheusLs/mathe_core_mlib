@@ -2,12 +2,12 @@
 Módulo Fundamental de Conversões Matemáticas e Físicas.
 
 Este módulo centraliza operações numéricas universais de conversão de grandezas
-frequentes no domínio de telecomunicações, sistemas fotônicos e processamento de sinais. 
+frequentes no domínio de telecomunicações, sistemas fotônicos e processamento de sinais.
 Implementado com suporte unificado a escalares em ponto flutuante, iteráveis base
 do Python e tensores de álgebra vetorial (`numpy.ndarray`).
 
 A conversão segue estritas políticas de invalidação de fronteiras nulas
-(`NaN`, logaritmos matemáticos de números não-positivos), provendo modos 
+(`NaN`, logaritmos matemáticos de números não-positivos), provendo modos
 declarativos para tratamento do comportamento divergente (`strict`, `warn`, `ignore`).
 
 Routines
@@ -33,17 +33,19 @@ Conversões Espectrais
 
 import warnings
 from typing import Literal
+
 import numpy as np
 import numpy.typing as npt
 from scipy.constants import c as SPEED_OF_LIGHT
 
 ArrayLike = float | int | list[float] | tuple[float, ...] | npt.NDArray[np.float64] | npt.NDArray[np.int_]
-ErrorMode = Literal['raise', 'warn', 'ignore']
+ErrorMode = Literal["raise", "warn", "ignore"]
 
 
 # ==========================================
 # Funções Auxiliares de Segurança
 # ==========================================
+
 
 def _validate_positive(value: npt.NDArray[np.float64], mode: ErrorMode, context: str) -> None:
     r"""
@@ -72,19 +74,18 @@ def _validate_positive(value: npt.NDArray[np.float64], mode: ErrorMode, context:
 
     Notes
     -----
-    Esta função foi projetada para atuar em domínios físicos (ex: distâncias e frequências físicas) 
+    Esta função foi projetada para atuar em domínios físicos (ex: distâncias e frequências físicas)
     onde valores negativos não possuem sentido matemático ou físico para a computação.
     """
-    if mode == 'ignore':
+    if mode == "ignore":
         return
 
     if np.any(value <= 0) or np.any(np.isnan(value)):
-        msg = (f"Entrada inválida em '{context}': valores devem ser estritamente positivos (> 0). "
-               f"Encontrados valores <= 0 ou NaN.")
-        
-        if mode == 'raise':
+        msg = f"Entrada inválida em '{context}': valores devem ser estritamente positivos (> 0). Encontrados valores <= 0 ou NaN."
+
+        if mode == "raise":
             raise ValueError(msg)
-        elif mode == 'warn':
+        elif mode == "warn":
             warnings.warn(msg, RuntimeWarning)
 
 
@@ -92,17 +93,18 @@ def _validate_positive(value: npt.NDArray[np.float64], mode: ErrorMode, context:
 # Conversões Genéricas (Adimensionais: Ganho, SNR)
 # ==========================================
 
-def lin2db(value: ArrayLike, mode: ErrorMode = 'raise') -> float | npt.NDArray[np.float64]:
+
+def lin2db(value: ArrayLike, mode: ErrorMode = "raise") -> float | npt.NDArray[np.float64]:
     r"""
     Converte um valor linear (adimensional) para a escala decibel (dB).
 
-    Aplicável para medidas de ganho, Razão Sinal-Ruído Óptica (OSNR), Razão Sinal-Ruído Generalizada (GSNR), 
+    Aplicável para medidas de ganho, Razão Sinal-Ruído Óptica (OSNR), Razão Sinal-Ruído Generalizada (GSNR),
     ou qualquer outra variável de razão de potências.
 
     Parameters
     ----------
     value : float | int | list[float] | tuple[float, ...] | npt.NDArray[np.float64]
-        Valor numérico (ou coleção de valores numéricos) em escala linear linear que se 
+        Valor numérico (ou coleção de valores numéricos) em escala linear linear que se
         deseja converter. Deve ser um valor positivo.
     mode : Literal['raise', 'warn', 'ignore'], optional
         Ação a tomar os valores não forem estritamente positivos (> 0). Padrão é `'raise'`.
@@ -110,7 +112,7 @@ def lin2db(value: ArrayLike, mode: ErrorMode = 'raise') -> float | npt.NDArray[n
     Returns
     -------
     float | npt.NDArray[np.float64]
-        Se `value` for um escalar, retorna um primitivo `float` em dB. Se `value` 
+        Se `value` for um escalar, retorna um primitivo `float` em dB. Se `value`
         for um iterável ou array, retorna um novo `npt.NDArray[np.float64]` com as conversões aplicadas em dB.
 
     Raises
@@ -133,9 +135,9 @@ def lin2db(value: ArrayLike, mode: ErrorMode = 'raise') -> float | npt.NDArray[n
     array([ 0., 10., 20.])
     """
     value_arr = np.asanyarray(value, dtype=np.float64)
-    _validate_positive(value_arr, mode, context='lin2db')
+    _validate_positive(value_arr, mode, context="lin2db")
 
-    with np.errstate(divide='ignore', invalid='ignore'):
+    with np.errstate(divide="ignore", invalid="ignore"):
         result = 10.0 * np.log10(value_arr)
 
     return float(result.item()) if result.ndim == 0 else result
@@ -153,13 +155,13 @@ def db2lin(value_db: ArrayLike) -> float | npt.NDArray[np.float64]:
     Returns
     -------
     float | npt.NDArray[np.float64]
-        O fator convertido em escala linear. Retorna um primitivo `float` escalar, 
+        O fator convertido em escala linear. Retorna um primitivo `float` escalar,
         ou array multi-dimensional a depender de `value_db`.
 
     Notes
     -----
     Matematicamente, desfaz-se a lógica da base 10 atenuada/amplificada:
-    
+
     $$ Linear = 10^{\frac{value_{dB}}{10}} $$
 
     Examples
@@ -179,7 +181,8 @@ def db2lin(value_db: ArrayLike) -> float | npt.NDArray[np.float64]:
 # Conversões de Potência (Watts, dBm)
 # ==========================================
 
-def watt2dbm(power_watt: ArrayLike, mode: ErrorMode = 'raise') -> float | npt.NDArray[np.float64]:
+
+def watt2dbm(power_watt: ArrayLike, mode: ErrorMode = "raise") -> float | npt.NDArray[np.float64]:
     r"""
     Converte potência explícita de Watts (W) para decibel-miliwatt (dBm).
 
@@ -202,22 +205,22 @@ def watt2dbm(power_watt: ArrayLike, mode: ErrorMode = 'raise') -> float | npt.ND
 
     Notes
     -----
-    A fórmula da conversão de Watts para a escala em dBm exige o shift originário do milésimo 
+    A fórmula da conversão de Watts para a escala em dBm exige o shift originário do milésimo
     (fator de $+30$ dB):
 
     $$ P_{dBm} = 10 \log_{10}(P_W) + 30 $$
 
     Examples
     --------
-    >>> watt2dbm(1e-3) # 1 mW exato  
+    >>> watt2dbm(1e-3) # 1 mW exato
     0.0
     >>> watt2dbm(1) # 1 Watt
     30.0
     """
     value_arr = np.asanyarray(power_watt, dtype=np.float64)
-    _validate_positive(value_arr, mode, context='watt2dbm')
+    _validate_positive(value_arr, mode, context="watt2dbm")
 
-    with np.errstate(divide='ignore', invalid='ignore'):
+    with np.errstate(divide="ignore", invalid="ignore"):
         result = 10.0 * np.log10(value_arr) + 30.0
 
     return float(result.item()) if result.ndim == 0 else result
@@ -240,7 +243,7 @@ def dbm2watt(power_dbm: ArrayLike) -> float | npt.NDArray[np.float64]:
     Notes
     -----
     Cálculo exato de regressão da amplificação decibel miliwatt de volta ao Watt (linear):
-    
+
     $$ P_{W} = 10^{\\frac{P_{dBm} - 30}{10}} $$
 
     Examples
@@ -253,7 +256,7 @@ def dbm2watt(power_dbm: ArrayLike) -> float | npt.NDArray[np.float64]:
     return float(result.item()) if result.ndim == 0 else result
 
 
-def watt2db(power_watt: ArrayLike, mode: ErrorMode = 'raise') -> float | npt.NDArray[np.float64]:
+def watt2db(power_watt: ArrayLike, mode: ErrorMode = "raise") -> float | npt.NDArray[np.float64]:
     r"""
     Converte grandeza de potência base (Watts) para decibel referido a 1 Watt (dBW).
 
@@ -276,7 +279,7 @@ def watt2db(power_watt: ArrayLike, mode: ErrorMode = 'raise') -> float | npt.NDA
 
     Notes
     -----
-    Matematicamente análogo à função genérica `lin2db`. Seu uso existe puramente 
+    Matematicamente análogo à função genérica `lin2db`. Seu uso existe puramente
     por clareza e separação semântica das varíaveis de estado e medição:
 
     $$ P_{dBW} = 10 \log_{10}(P_W) $$
@@ -307,7 +310,7 @@ def db2watt(value_db: ArrayLike) -> float | npt.NDArray[np.float64]:
 
     Notes
     -----
-    Matematicamente análogo à função genérica `db2lin`. Seu uso existe puramente 
+    Matematicamente análogo à função genérica `db2lin`. Seu uso existe puramente
     por clareza e separação semântica das varíaveis de estado e medição:
 
     Examples
@@ -322,7 +325,8 @@ def db2watt(value_db: ArrayLike) -> float | npt.NDArray[np.float64]:
 # Conversões de Frequência e Comprimento de Onda
 # ==========================================
 
-def freq_Hz_to_wavelength_m(freq_Hz: ArrayLike, mode: ErrorMode = 'raise') -> float | npt.NDArray[np.float64]:
+
+def freq_Hz_to_wavelength_m(freq_Hz: ArrayLike, mode: ErrorMode = "raise") -> float | npt.NDArray[np.float64]:
     r"""
     Converte a frequência f (em Hertz) de um espectro luminoso para o seu comprimento de onda $\\lambda$ equivalente em metros (m).
 
@@ -357,15 +361,15 @@ def freq_Hz_to_wavelength_m(freq_Hz: ArrayLike, mode: ErrorMode = 'raise') -> fl
     1.55252e-06
     """
     freq_arr = np.asanyarray(freq_Hz, dtype=np.float64)
-    _validate_positive(freq_arr, mode, context='freq_Hz_to_wavelength_m')
-    
-    with np.errstate(divide='ignore'):
+    _validate_positive(freq_arr, mode, context="freq_Hz_to_wavelength_m")
+
+    with np.errstate(divide="ignore"):
         result = SPEED_OF_LIGHT / freq_arr
-        
+
     return float(result.item()) if result.ndim == 0 else result
 
 
-def wavelength_m_to_freq_Hz(wavelength_m: ArrayLike, mode: ErrorMode = 'raise') -> float | npt.NDArray[np.float64]:
+def wavelength_m_to_freq_Hz(wavelength_m: ArrayLike, mode: ErrorMode = "raise") -> float | npt.NDArray[np.float64]:
     r"""
     Converte um determinado comprimento de onda da luz do espaço livre, denotado em metros, para o seu sinal oscilatório correspondente em Hertz.
 
@@ -398,15 +402,15 @@ def wavelength_m_to_freq_Hz(wavelength_m: ArrayLike, mode: ErrorMode = 'raise') 
     193.4
     """
     wl_arr = np.asanyarray(wavelength_m, dtype=np.float64)
-    _validate_positive(wl_arr, mode, context='wavelength_m_to_freq_Hz')
-    
-    with np.errstate(divide='ignore'):
+    _validate_positive(wl_arr, mode, context="wavelength_m_to_freq_Hz")
+
+    with np.errstate(divide="ignore"):
         result = SPEED_OF_LIGHT / wl_arr
-        
+
     return float(result.item()) if result.ndim == 0 else result
 
 
-def wavelength_nm_to_freq_Hz(wavelength_nm: ArrayLike, mode: ErrorMode = 'raise') -> float | npt.NDArray[np.float64]:
+def wavelength_nm_to_freq_Hz(wavelength_nm: ArrayLike, mode: ErrorMode = "raise") -> float | npt.NDArray[np.float64]:
     r"""
     Identifica a frequência analógica equivalente de rede em Hertz, através base em nanômetros.
 
@@ -425,7 +429,7 @@ def wavelength_nm_to_freq_Hz(wavelength_nm: ArrayLike, mode: ErrorMode = 'raise'
     Notes
     -----
     É aplicada uma substituição relacional da unidade base convertida dinamicamente durante operação:
-    
+
     $$ f_{Hz} = \\frac{c}{\\lambda_{nm} \\times 10^{-9}} $$
 
     Examples
@@ -434,16 +438,16 @@ def wavelength_nm_to_freq_Hz(wavelength_nm: ArrayLike, mode: ErrorMode = 'raise'
     193.41
     """
     wl_nm_arr = np.asanyarray(wavelength_nm, dtype=np.float64)
-    _validate_positive(wl_nm_arr, mode, context='wavelength_nm_to_freq_Hz')
-    
-    with np.errstate(divide='ignore'):
+    _validate_positive(wl_nm_arr, mode, context="wavelength_nm_to_freq_Hz")
+
+    with np.errstate(divide="ignore"):
         # nm para m: * 1e-9
         result = SPEED_OF_LIGHT / (wl_nm_arr * 1e-9)
-        
+
     return float(result.item()) if result.ndim == 0 else result
 
 
-def freq_Hz_to_wavelength_nm(freq_Hz: ArrayLike, mode: ErrorMode = 'raise') -> float | npt.NDArray[np.float64]:
+def freq_Hz_to_wavelength_nm(freq_Hz: ArrayLike, mode: ErrorMode = "raise") -> float | npt.NDArray[np.float64]:
     r"""
     Expressa as amplitudes da frequência (Hz) na métrica padrão consolidada da indústria ótica de nanômetros (nm).
 
@@ -462,7 +466,7 @@ def freq_Hz_to_wavelength_nm(freq_Hz: ArrayLike, mode: ErrorMode = 'raise') -> f
     Notes
     -----
     Cálculo linear de manipulação numérica a base da conversão central para metros e extração multiplicativa do fator 9:
-    
+
     $$ \\lambda_{nm} = \\left( \\frac{c}{f_{Hz}} \\right) \\times 10^{9} $$
 
     Examples
@@ -472,12 +476,12 @@ def freq_Hz_to_wavelength_nm(freq_Hz: ArrayLike, mode: ErrorMode = 'raise') -> f
     1552.52
     """
     freq_arr = np.asanyarray(freq_Hz, dtype=np.float64)
-    _validate_positive(freq_arr, mode, context='freq_Hz_to_wavelength_nm')
-    
-    with np.errstate(divide='ignore'):
+    _validate_positive(freq_arr, mode, context="freq_Hz_to_wavelength_nm")
+
+    with np.errstate(divide="ignore"):
         # mt para nm: * 1e9
         result = (SPEED_OF_LIGHT / freq_arr) * 1e9
-        
+
     return float(result.item()) if result.ndim == 0 else result
 
 
@@ -498,7 +502,7 @@ def freq_GHz_to_Hz(freq_GHz: ArrayLike) -> float | npt.NDArray[np.float64]:
     Notes
     -----
     Expansão direta multiplicativa: $Hz = GHz \\times 10^{9}$.
-    
+
     Examples
     --------
     >>> freq_GHz_to_Hz(50.0)

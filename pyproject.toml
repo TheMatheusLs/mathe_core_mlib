@@ -28,7 +28,8 @@ dev = [
     "pydeps (>=3.0.2,<4.0.0)",
     "pre-commit (>=4.5.1,<5.0.0)",
     "pytest (>=9.0.2,<10.0.0)",
-    "pytest-cov (>=7.0.0,<8.0.0)"
+    "pytest-cov (>=7.0.0,<8.0.0)",
+    "ruff (>=0.15.17,<0.16.0)"
 ]
 
 [[tool.poetry.packages]]
@@ -38,3 +39,27 @@ from = "src"
 [tool.pytest.ini_options]
 pythonpath = ["src"]
 testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 140
+
+# Versão mínima do Python que seus projetos suportam
+target-version = "py312"
+
+[tool.ruff.lint]
+# Seleciona quais categorias de regras o Ruff vai verificar
+select = [
+    "E",  # pycodestyle errors (erros de estilo básicos)
+    "W",  # pycodestyle warnings
+    "F",  # pyflakes (erros de lógica, variáveis não usadas)
+    "I",  # isort (organização de imports)
+]
+
+# Ignora algumas regras se elas forem muito chatas para o seu contexto (opcional)
+ignore = []
+
+[tool.ruff.format]
+# Usa aspas duplas (padrão do Black)
+quote-style = "double"
+# Indentação com espaços
+indent-style = "space"
