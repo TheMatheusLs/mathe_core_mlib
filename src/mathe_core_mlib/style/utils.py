@@ -6,7 +6,7 @@ from matplotlib.figure import Figure
 from matplotlib.patches import Rectangle
 from matplotlib.ticker import FuncFormatter
 
-from mathe_core_mlib.style.utils import _PALETTE_BASE
+from mathe_core_mlib.style.custom_palletes import _PALETTE_BASE
 
 
 def save_figure(fig: Figure, path: Path, *, pgf: bool = False) -> None:
