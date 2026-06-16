@@ -1,6 +1,6 @@
 [project]
 name = "mathe-core-mlib"
-version = "2.1.0"
+version = "2.1.1"
 description = "Pacotes Úteis"
 authors = [
     {name = "Matheus Lôbo",email = "matheusls@live.com"}
