@@ -1,7 +1,7 @@
 import shutil
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Union
 
 
 class ExperimentFolder:
@@ -10,10 +10,11 @@ class ExperimentFolder:
     Gera nomes baseados em Timestamp e Tag.
     """
 
-    def __init__(self, base_path: Path, tag: str = "sim", version: str = ""):
+    def __init__(self, base_path: Union[Path, str], tag: str = "sim", version: str = ""):
         """
         Args:
             base_path: Diretório raiz onde a pasta será criada (ex: './results').
+                Aceita str — os chamadores passam o `path_to_save` lido do YAML.
             tag: Identificador curto do experimento (ex: 'GA_Optimization').
             version: Versão opcional para compor o nome (ex: 'v1.0').
         """
@@ -25,15 +26,15 @@ class ExperimentFolder:
             folder_name_parts.append("version_" + version.replace(".", "-"))
         folder_name_parts.append(tag)
 
-        self.base_path = base_path
+        self.base_path = Path(base_path)
 
         # Cria a pasta imediatamente (com nome único, mesmo sob concorrência)
-        self.path = self._create_unique_dir(base_path, "_".join(folder_name_parts))
+        self.path = self._create_unique_dir(self.base_path, "_".join(folder_name_parts))
         self.folder_name = self.path.name
         self._finalized = False
 
     @staticmethod
-    def _create_unique_dir(base_path: Path, folder_name: str, max_attempts: int = 1000) -> Path:
+    def _create_unique_dir(base_path: Union[Path, str], folder_name: str, max_attempts: int = 1000) -> Path:
         """
         Cria a pasta garantindo unicidade mesmo com processos concorrentes.
 
@@ -50,6 +51,7 @@ class ExperimentFolder:
         Returns:
             O caminho da pasta efetivamente criada.
         """
+        base_path = Path(base_path)
         candidate = base_path / folder_name
         for attempt in range(2, max_attempts + 2):
             try:

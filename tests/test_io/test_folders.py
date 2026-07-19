@@ -23,6 +23,22 @@ def test_creates_folder_with_timestamp_tag_and_version(tmp_path: Path) -> None:
     assert exp.get_folder_name() == exp.path.name
 
 
+def test_accepts_str_base_path_like_real_callers(tmp_path: Path) -> None:
+    # Os chamadores passam o `path_to_save` lido do YAML — uma STRING, não Path
+    # (run.py, MB-logo.py, run_simulation.py do simulador). Passar str precisa
+    # funcionar tanto no caminho feliz quanto na colisão (que concatena o sufixo).
+    base_str = str(tmp_path) + "/"
+
+    first = ExperimentFolder(base_path=base_str, tag="PSD_otm", version="1.0.3")
+    second = ExperimentFolder(base_path=base_str, tag="PSD_otm", version="1.0.3")
+
+    assert first.path.is_dir() and second.path.is_dir()
+    assert first.path != second.path
+    assert isinstance(first.base_path, Path)
+    first.finish(status="success")
+    assert first.path.name.endswith("_SUCCESS")
+
+
 def test_two_experiments_in_same_second_get_distinct_folders(tmp_path: Path) -> None:
     # Mesmo segundo ⇒ mesmo nome-base: o segundo deve ganhar sufixo, não estourar.
     first = ExperimentFolder(base_path=tmp_path, tag="sim")
