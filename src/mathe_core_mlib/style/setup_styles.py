@@ -42,7 +42,7 @@ def setup_academic_style(columns: int = 1) -> None:
             "xtick.direction": "in",
             "ytick.direction": "in",
             "xtick.major.size": 3.5,
-            "ytick.major.width": 0.8,
+            "xtick.major.width": 0.8,
             "ytick.major.size": 3.5,
             "ytick.major.width": 0.8,
             "xtick.minor.visible": True,

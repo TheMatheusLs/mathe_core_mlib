@@ -1,10 +1,27 @@
 # Mathe Core MLIB (`mathe-core-mlib`)
 
+![Status](https://img.shields.io/badge/status-finalizado-brightgreen)
+![Versão](https://img.shields.io/badge/vers%C3%A3o-2.1.3-blue)
+![Python](https://img.shields.io/badge/python-%3E%3D3.12-blue)
+![Testes](https://img.shields.io/badge/testes-76%20passing-brightgreen)
+![Licença](https://img.shields.io/badge/licen%C3%A7a-acad%C3%AAmica-lightgrey)
+
 Biblioteca modular de alta performance e utilitários científicos desenvolvida para suportar simulações de redes ópticas (foco em GNPy), algoritmos de otimização e gestão de dados experimentais.
 
 **Desenvolvido por:** Matheus Lôbo dos Santos (matheus.lobo@ufpe.br)
 
 A `mathe-core-mlib` foi construída sob o princípio de **Fail-Fast (Falha Rápida)**. Em simulações científicas de longa duração, erros silenciosos podem invalidar dias de processamento. Esta biblioteca garante a integridade dos dados através de validações rigorosas, automação de IO e isolamento de dependências.
+
+---
+
+## 📦 Módulos
+
+| Módulo | Conteúdo |
+| --- | --- |
+| `mathe_core_mlib.math` | Conversores vetorizados (dB/linear, W/dBm, frequência ↔ comprimento de onda) sobre NumPy/SciPy. |
+| `mathe_core_mlib.io` | IO de JSON/YAML/Pickle/CSV/Parquet, hash de arquivos, `ExperimentFolder` (pastas de experimento à prova de concorrência) e o *gatekeeper* de ambiente limpo. |
+| `mathe_core_mlib.analysis` | Comparação de configurações YAML entre execuções para auditar reprodutibilidade. |
+| `mathe_core_mlib.style` | Estilo Matplotlib acadêmico e paletas customizadas. |
 
 ---
 
@@ -85,6 +102,8 @@ A biblioteca possui uma suíte de testes unitários automatizados cobrindo os li
 poetry run pytest --cov=src/mathe_core_mlib --cov-report=term-missing
 
 ```
+
+Estado atual: **76 testes passando**, cobertura global de **74%** (módulos `math` e `io.files` em 100%).
 
 ---
 
