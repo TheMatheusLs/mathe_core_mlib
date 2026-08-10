@@ -4,6 +4,15 @@ Todas as mudanças relevantes desta biblioteca. Os artefatos gravados em disco
 carregam a versão do software que os gerou, então cada entrada aqui corresponde
 a um conjunto de arquivos rastreável.
 
+## [3.1.0] - 2026-08-10
+
+### Adicionado
+
+- `save_figure` aceita `dpi: int | None`. O valor só é repassado ao Matplotlib
+  quando explícito; `None` mantém `rcParams["savefig.dpi"]`. Existe para que
+  chamadores que já fixavam um DPI (como o `plot_scenario_allocation` do
+  `gnpy_mlab`) possam migrar para o `save_figure` sem alterar a saída.
+
 ## [3.0.0] - 2026-08-10
 
 ### BREAKING

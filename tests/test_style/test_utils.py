@@ -56,6 +56,14 @@ def test_save_figure_requires_version(tmp_path: Path, fig) -> None:
         save_figure(fig, tmp_path / "perfil")
 
 
+@pytest.mark.parametrize("dpi", [None, 300])
+def test_save_figure_accepts_optional_dpi(tmp_path: Path, fig, dpi) -> None:
+    # dpi=None nao pode ser repassado ao matplotlib; so o valor explicito vai adiante
+    save_figure(fig, tmp_path / "perfil", VERSION, dpi=dpi)
+
+    assert (tmp_path / "perfil.pdf").is_file()
+
+
 def test_save_figure_creates_missing_parent_directories(tmp_path: Path, fig) -> None:
     destino = tmp_path / "a" / "b" / "perfil"
 

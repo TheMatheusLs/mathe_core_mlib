@@ -80,6 +80,7 @@ def save_figure(
     *,
     software: str | None = None,
     extra_meta: dict[str, Any] | None = None,
+    dpi: int | None = None,
     pgf: bool = False,
 ) -> None:
     """
@@ -102,6 +103,11 @@ def save_figure(
         Nome do projeto gerador (ex.: ``"MGNPyEONv3"``).
     extra_meta : dict[str, Any] or None, optional
         Campos extras de proveniência (ex.: ``{"scenario": "parabolic"}``).
+    dpi : int or None, optional
+        Resolução de exportação. ``None`` (padrão) mantém o valor de
+        ``rcParams["savefig.dpi"]``. Em PDF vetorial só afeta artistas
+        rasterizados, mas existe para preservar o comportamento de chamadores
+        que já fixavam um DPI explícito.
     pgf : bool, optional
         Se ``True``, salva também o ``.pgf`` para inclusão direta em LaTeX.
 
@@ -124,7 +130,14 @@ def save_figure(
     path.parent.mkdir(parents=True, exist_ok=True)
 
     pdf_path = path.with_suffix(".pdf")
-    fig.savefig(pdf_path, bbox_inches="tight", backend="pdf", metadata=_pdf_info_dict(metadata, path.name))
+
+    # dpi só é repassado quando explícito: matplotlib não aceita None e usaria
+    # o default do rcParams de qualquer forma
+    savefig_kwargs: dict[str, Any] = {"bbox_inches": "tight", "backend": "pdf", "metadata": _pdf_info_dict(metadata, path.name)}
+    if dpi is not None:
+        savefig_kwargs["dpi"] = dpi
+
+    fig.savefig(pdf_path, **savefig_kwargs)
 
     written = [pdf_path.name]
 
