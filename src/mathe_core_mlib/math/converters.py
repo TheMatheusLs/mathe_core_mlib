@@ -357,7 +357,7 @@ def freq_Hz_to_wavelength_m(freq_Hz: ArrayLike, mode: ErrorMode = "raise") -> fl
 
     Examples
     --------
-    >>> round(freq_Hz_to_wavelength_m(193.1e12), 9)
+    >>> round(freq_Hz_to_wavelength_m(193.1e12), 11)
     1.55252e-06
     """
     freq_arr = np.asanyarray(freq_Hz, dtype=np.float64)
@@ -371,14 +371,16 @@ def freq_Hz_to_wavelength_m(freq_Hz: ArrayLike, mode: ErrorMode = "raise") -> fl
 
 def wavelength_m_to_freq_Hz(wavelength_m: ArrayLike, mode: ErrorMode = "raise") -> float | npt.NDArray[np.float64]:
     r"""
-    Converte um determinado comprimento de onda da luz do espaço livre, denotado em metros, para o seu sinal oscilatório correspondente em Hertz.
+    Converte um determinado comprimento de onda da luz do espaço livre, denotado em
+    metros, para o seu sinal oscilatório correspondente em Hertz.
 
     Parameters
     ----------
     wavelength_m : float | int | list[float] | tuple[float, ...] | npt.NDArray[np.float64]
         A métrica física e geométrica da oscilação de pico, extraída em metros no sistema métrico.
     mode : Literal['raise', 'warn', 'ignore'], optional
-        Como prevenir a singularidade ou distorção real que a ausência do sinal (0 m), ou um comprimento negativo, carrega ao cálculo físico. Padrão: `'raise'`.
+        Como prevenir a singularidade ou distorção real que a ausência do sinal (0 m),
+        ou um comprimento negativo, carrega ao cálculo físico. Padrão: `'raise'`.
 
     Returns
     -------
@@ -417,7 +419,8 @@ def wavelength_nm_to_freq_Hz(wavelength_nm: ArrayLike, mode: ErrorMode = "raise"
     Parameters
     ----------
     wavelength_nm : float | int | list[float] | tuple[float, ...] | npt.NDArray[np.float64]
-        Magnitude analítica da onda em precisão macro ou nano sub-atômica dependendo dos sistemas. No caso específico em fator fixo do Nanômetro ($10^{-9}$ m).
+        Magnitude analítica da onda em precisão macro ou nano sub-atômica dependendo
+        dos sistemas. No caso específico em fator fixo do Nanômetro ($10^{-9}$ m).
     mode : Literal['raise', 'warn', 'ignore'], optional
         Lida ativamente com divisões sobre elementos de comprimento igual a zero.
 

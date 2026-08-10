@@ -60,10 +60,7 @@ class ExperimentFolder:
             except FileExistsError:
                 candidate = base_path / f"{folder_name}_{attempt}"
 
-        raise FileExistsError(
-            f"Não foi possível criar uma pasta única para '{folder_name}' em {base_path} "
-            f"após {max_attempts} tentativas."
-        )
+        raise FileExistsError(f"Não foi possível criar uma pasta única para '{folder_name}' em {base_path} após {max_attempts} tentativas.")
 
     def get_folder_name(self) -> str:
         """Retorna o nome da pasta do experimento."""

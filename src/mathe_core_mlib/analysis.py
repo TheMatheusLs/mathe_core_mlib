@@ -18,6 +18,8 @@ from pathlib import Path
 import pandas as pd
 import yaml
 
+from mathe_core_mlib.io.provenance import META_KEY
+
 
 def compare_yaml_files(
     folders: list[Path], ignore_path_to_scenarios: bool = False, ignore_is_debug: bool = False, ignore_parameters: bool = False
@@ -37,17 +39,19 @@ def compare_yaml_files(
     Example:
         >>> from pathlib import Path
         >>> folders = [Path("sim_v1"), Path("sim_v2")]
-        >>> match, msg, config = compare_yaml_files(folders)
-        >>> if match:
-        ...     print("✅ Configurações idênticas")
+        >>> match, msg, config = compare_yaml_files(folders)  # doctest: +SKIP
+        >>> if match:  # doctest: +SKIP
+        ...     print("Configuracoes identicas")
     """
     # Convert strings to Path objects if necessary
     folders = [Path(f) if isinstance(f, str) else f for f in folders]
 
     configs = []
 
-    # Campos que SEMPRE devem ser ignorados
-    always_ignore = ["path_to_save", "max_workers"]
+    # Campos que SEMPRE devem ser ignorados.
+    # '_meta' carrega timestamp/commit e difere entre execuções por construção:
+    # compará-lo faria toda comparação de config falhar.
+    always_ignore = ["path_to_save", "max_workers", META_KEY]
 
     for folder in folders:
         config_file = folder / "sim_config.yaml"
@@ -127,8 +131,8 @@ def compare_env_snapshots(
         >>> from pathlib import Path
         >>> folders = [Path("sim_v1"), Path("sim_v2")]
         >>> labels = {"sim_v1": "Original", "sim_v2": "Optimized"}
-        >>> match, msg, df = compare_env_snapshots(folders, labels)
-        >>> print(df[df['Diferente'] == '⚠️'])  # Mostrar apenas diferenças
+        >>> match, msg, df = compare_env_snapshots(folders, labels)  # doctest: +SKIP
+        >>> print(df[df["Diferente"] == "⚠️"])  # so as diferencas  # doctest: +SKIP
     """
     # Convert strings to Path objects if necessary
     folders = [Path(f) if isinstance(f, str) else f for f in folders]
