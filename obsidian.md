@@ -21,6 +21,10 @@ carregue registro de quem o produziu.
   `version` e grava um bloco de metadados (`_meta` em JSON/YAML/Pickle, schema
   Arrow em Parquet, sidecar `.meta.json` em figuras). Esquecer a versão levanta
   `TypeError` — é intencional.
+- Traz o diagnóstico de submódulos git (`io/submodules.py`). Rode
+  `python scripts/check_modules.py --fetch ../<simulador> ...` daqui mesmo, sem
+  precisar instalar a lib no projeto alvo — aceita vários projetos por vez.
+  Quem instala a lib também ganha o console script `check-modules`.
 - Os `load_*` removem o `_meta` antes de devolver os dados; use `return_meta=True`
   para acessá-lo.
 - **Esta lib existe em dois checkouts no disco** (`project/mathe_core_mlib` e o

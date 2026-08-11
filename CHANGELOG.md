@@ -4,6 +4,35 @@ Todas as mudanças relevantes desta biblioteca. Os artefatos gravados em disco
 carregam a versão do software que os gerou, então cada entrada aqui corresponde
 a um conjunto de arquivos rastreável.
 
+## [3.3.0] - 2026-08-10
+
+### Adicionado
+
+- Módulo `io/submodules.py`: diagnóstico de submódulos git, reutilizável por
+  qualquer simulador. Nasceu como script local do `MGNPyEONv3` e foi generalizado
+  — o layout dos submódulos vem do `.gitmodules` (via `git config`), não de uma
+  pasta `modules/` presumida, e a raiz do repositório é detectada sozinha.
+  Responde as três perguntas que `git submodule status` confunde: se o ponteiro
+  bate com a pasta, se o commit fixado é o mais recente do remoto, e se esse
+  commit chegou a ser publicado.
+- **`scripts/check_modules.py`**: script executável direto deste repositório,
+  sem exigir que a lib esteja instalada no ambiente do projeto alvo — serve para
+  inspecionar simuladores ainda não migrados ou com venv quebrado.
+- A CLI aceita **vários projetos numa chamada só**
+  (`python scripts/check_modules.py --fetch ../MGNPyEONv3 ../OpticalSimMBEON`).
+  Cada projeto é avaliado de forma independente: um que falhe não interrompe a
+  varredura dos demais, e o código de saída (0/1) permite encadear em CI.
+- Também disponível como `python -m mathe_core_mlib.io.submodules` e como
+  console script `check-modules`, para os projetos que instalam a lib.
+
+### Notas
+
+- `ModuleState.is_healthy` exige `checkout_commit` não vazio. Sem isso, um
+  submódulo declarado mas nunca inicializado passava como saudável, porque o
+  commit registrado e o do disco ficam ambos vazios e "coincidem". Encontrado
+  por teste.
+- Repositórios sem submódulos são tratados explicitamente, não como erro.
+
 ## [3.1.0] - 2026-08-10
 
 ### Adicionado

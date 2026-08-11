@@ -1,6 +1,6 @@
 [project]
 name = "mathe-core-mlib"
-version = "3.2.0"
+version = "3.3.0"
 description = "Pacotes Úteis"
 authors = [
     {name = "Matheus Lôbo",email = "matheusls@live.com"}
@@ -18,6 +18,10 @@ dependencies = [
     "cycler (>=0.12.1,<0.13.0)"
 ]
 
+
+[project.scripts]
+# Diagnostico de submodulos, disponivel em qualquer projeto que instale esta lib
+check-modules = "mathe_core_mlib.io.submodules:main"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
