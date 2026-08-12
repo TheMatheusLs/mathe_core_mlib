@@ -25,6 +25,9 @@ carregue registro de quem o produziu.
   `python scripts/check_modules.py --fetch ../<simulador> ...` daqui mesmo, sem
   precisar instalar a lib no projeto alvo — aceita vários projetos por vez.
   Quem instala a lib também ganha o console script `check-modules`.
+- Para **ver** a proveniência já gravada (sem alterar nada):
+  `python scripts/show_metadata.py <pasta-ou-arquivo>`. Com `--only-missing`,
+  vira auditoria dos artefatos que não têm metadados.
 - Os `load_*` removem o `_meta` antes de devolver os dados; use `return_meta=True`
   para acessá-lo.
 - **Esta lib existe em dois checkouts no disco** (`project/mathe_core_mlib` e o

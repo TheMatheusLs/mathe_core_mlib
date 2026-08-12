@@ -4,6 +4,46 @@ Todas as mudanças relevantes desta biblioteca. Os artefatos gravados em disco
 carregam a versão do software que os gerou, então cada entrada aqui corresponde
 a um conjunto de arquivos rastreável.
 
+## [3.5.0] - 2026-08-11
+
+### Adicionado
+
+- Campo **`hostname`** no bloco de proveniência, vindo de `platform.node()`
+  (stdlib, sem dependência nova). Identifica em qual máquina o artefato foi
+  produzido — útil justamente quando duas máquinas divergem numericamente.
+- Variável de ambiente **`MATHE_META_NO_HOSTNAME=1`** omite o campo. Existe
+  porque o nome da máquina costuma conter o nome da pessoa (`Yoga7iMatheus`,
+  `DESKTOP-JOAO`), o que o torna um dado identificável ao publicar arquivos como
+  material suplementar — em especial sob revisão duplo-cega.
+- `find_identifying_fields(metadata)` em `io/metadata_reader.py`: aponta os
+  campos que identificam pessoa ou máquina (nome de host e caminhos absolutos
+  em qualquer valor), para revisar um artefato antes de publicá-lo.
+- `scripts/show_metadata.py --privacy`: aplica essa revisão a uma pasta inteira
+  e devolve código de saída 1 se encontrar algo identificável.
+
+## [3.4.0] - 2026-08-11
+
+### Adicionado
+
+- Módulo `io/metadata_reader.py`: leitura **somente-leitura** da proveniência de
+  qualquer artefato. `read_metadata(path)` despacha por extensão e devolve o
+  bloco gravado — chave `_meta` em JSON/YAML, envelope em Pickle, key-value do
+  schema em Parquet, dicionário Info em PDF, conteúdo integral nos companheiros
+  `.meta.json`. Nenhuma função abre arquivo para escrita.
+- `iter_artifacts(root)`: percorre uma pasta listando os artefatos inspecionáveis.
+- **`scripts/show_metadata.py`**: CLI de visualização e auditoria, com
+  `--summary` (uma linha por arquivo), `--only-missing` (lista o que **não** tem
+  proveniência) e `--no-recursive`. Código de saída 0/1 permite usar em CI.
+
+### Segurança
+
+- Ler `.pkl` exige `allow_pickle=True` explícito (ou `--allow-pickle` na CLI):
+  desserializar um pickle executa código arbitrário, e uma ferramenta de
+  auditoria não deve fazer isso por padrão ao varrer uma pasta.
+- O parser do PDF trata as sequências de escape (`\(`, `\)`, `\\`) do formato:
+  sem isso, um campo como ``commit abc (dirty)`` era truncado no primeiro
+  parêntese.
+
 ## [3.3.0] - 2026-08-10
 
 ### Adicionado

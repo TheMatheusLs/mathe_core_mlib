@@ -18,6 +18,7 @@ as_string_mapping : Achata os metadados em ``dict[str, str]`` (Parquet/Arrow).
 """
 
 import json
+import os
 import platform
 import subprocess
 import sys
@@ -31,6 +32,15 @@ META_KEY = "_meta"
 
 #: Chave que carrega o objeto original dentro do envelope de Pickle.
 DATA_KEY = "_data"
+
+#: Definir como "1" omite o ``hostname`` dos metadados.
+#:
+#: O nome da máquina é útil para saber onde um resultado foi produzido — em
+#: especial quando duas máquinas divergem numericamente. Mas ele costuma conter
+#: o nome da pessoa (``Yoga7iMatheus``, ``DESKTOP-JOAO``), o que o torna um dado
+#: identificável ao publicar arquivos como material suplementar, sobretudo em
+#: revisão duplo-cega. Este opt-out existe para essas ocasiões.
+NO_HOSTNAME_ENV_VAR = "MATHE_META_NO_HOSTNAME"
 
 #: Timeout curto: git é local, se travar não vale bloquear a simulação.
 _GIT_TIMEOUT_S = 5
@@ -112,7 +122,9 @@ def build_metadata(
     -------
     dict[str, Any]
         Dicionário de proveniência com, no mínimo, ``created_at`` (UTC, ISO 8601),
-        ``software_version``, ``python_version`` e ``platform``.
+        ``software_version``, ``python_version`` e ``platform``. Inclui também
+        ``hostname``, salvo se :data:`NO_HOSTNAME_ENV_VAR` estiver definido — ver
+        a constante para as implicações de privacidade ao publicar dados.
 
     Raises
     ------
@@ -140,6 +152,13 @@ def build_metadata(
         "python_version": platform.python_version(),
         "platform": platform.platform(),
     }
+
+    # Nome da maquina: identifica onde o resultado foi produzido. Omitido quando
+    # MATHE_META_NO_HOSTNAME=1, ver a constante para o motivo.
+    if os.environ.get(NO_HOSTNAME_ENV_VAR, "") != "1":
+        hostname = platform.node()
+        if hostname:
+            metadata["hostname"] = hostname
 
     if software:
         metadata["software"] = software

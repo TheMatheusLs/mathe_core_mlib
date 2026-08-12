@@ -88,3 +88,30 @@ def test_string_mapping_produces_only_strings() -> None:
 
 def test_command_line_returns_string() -> None:
     assert isinstance(command_line(), str)
+
+
+# ---------------------------------------------------------------------------
+# Hostname e o opt-out de privacidade
+# ---------------------------------------------------------------------------
+
+
+def test_hostname_is_recorded_by_default() -> None:
+    import platform
+
+    meta = build_metadata("1.0.0", include_git=False)
+
+    assert meta["hostname"] == platform.node()
+
+
+def test_hostname_is_omitted_when_opted_out(monkeypatch) -> None:
+    # Nome de maquina costuma conter o nome da pessoa: precisa ser suprimivel
+    # antes de publicar dados como material suplementar.
+    monkeypatch.setenv(provenance.NO_HOSTNAME_ENV_VAR, "1")
+
+    assert "hostname" not in build_metadata("1.0.0", include_git=False)
+
+
+def test_opt_out_only_triggers_on_exact_value(monkeypatch) -> None:
+    monkeypatch.setenv(provenance.NO_HOSTNAME_ENV_VAR, "0")
+
+    assert "hostname" in build_metadata("1.0.0", include_git=False)

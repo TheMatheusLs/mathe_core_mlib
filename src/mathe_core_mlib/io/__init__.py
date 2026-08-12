@@ -12,6 +12,7 @@ from .files import (
     save_yaml,
 )
 from .folders import ExperimentFolder
+from .metadata_reader import iter_artifacts, read_metadata
 from .provenance import DATA_KEY, META_KEY, as_string_mapping, build_metadata, command_line
 from .submodules import ModuleState, collect_submodule_states, find_repo_root, format_report
 
@@ -28,11 +29,13 @@ __all__ = [
     "enforce_clean_environment",
     "find_repo_root",
     "format_report",
+    "iter_artifacts",
     "load_csv",
     "load_json",
     "load_parquet",
     "load_pickle",
     "load_yaml",
+    "read_metadata",
     "save_json",
     "save_parquet",
     "save_pickle",
